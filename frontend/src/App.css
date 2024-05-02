@@ -56,3 +56,9 @@ button{
 button:hover{
   background: #007f8b;
 }
+
+.error-message {
+  font-size: small;
+  color: red;
+  padding-bottom: 10px;
+}
