@@ -8,6 +8,7 @@ if user is admin
 */
 
 import React, { useState } from 'react';
+import axios from 'axios';
 import './App.css';
 
 function Login() {
@@ -34,30 +35,40 @@ function Login() {
     }
     }
 
-    const handleLoginSubmit = (event) => {
+    const handleLoginSubmit = async (event) => {
         event.preventDefault();
 
         // SEND TO SERVER
+        try {
+            const response = await axios.post('http://localhost:3001/login', {
+                username: loginUsername,
+                password: loginPassword,
+            });
+
+            console.log(response.data); // Handle login success
+        } catch (error) {
+            console.error('Login failed:', error);
+        }
     };
+   
 
-    const handleRegisterSubmit = (event) => {
+    const handleRegisterSubmit = async (event) => {
         event.preventDefault();
-        const passwordError = validatePassword(registerPassword);
-        const usernameError = validateUsername(registerUsername);
-        if(usernameError){
-          setRegistrationError(usernameError);
-          return
-        }
-        if (passwordError) {
-          setRegistrationError(passwordError);
-          return;
-        }
         if (registerPassword !== confirmPassword) {
-          setRegistrationError("Passwords do not match.");
-          return;
+            setRegistrationError('Passwords do not match.');
+            return;
         }
-        setRegistrationError('');
-        // SEND TO SERVER
+
+        try {
+            const response = await axios.post('http://localhost:3001/register', {
+                username: registerUsername,
+                password: registerPassword,
+            });
+
+            console.log(response.data); // Handle registration success
+        } catch (error) {
+            console.error('Registration failed:', error);
+        }
     };
 
     return (

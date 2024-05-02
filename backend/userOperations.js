@@ -1,75 +1,79 @@
 const express = require('express');
-const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
 
 const app = express();
-const port = 3001;
+const port = 3000;
 
 app.use(bodyParser.json());
 
-// Create MySQL connection
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'mysql_username',
-  password: 'mysql_password',
-  database: 'database_name',
+
+mongoose.connect('mongodb+srv://AppointmentApp:25at9O2aKBuIYDws@cluster0.dd4bnzq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 });
 
-// Connect to MySQL
-connection.connect((err) => {
-  if (err) {
-    console.error('Error connecting to user database: ', err);
-    return;
-  }
-  console.log('Connected to user database');
+const db = mongoose.connection;
+
+db.on('error', (err) => {
+    console.error('Error connecting to MongoDB:', err);
 });
+
+db.once('open', () => {
+    console.log('Connected to MongoDB');
+});
+
+// Define MongoDB Schema and Model
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true },
+    password: { type: String, required: true },
+});
+
+const User = mongoose.model('User', userSchema);
 
 // Handle login request
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  connection.query(
-    'SELECT * FROM users WHERE username = ?',
-    [username],
-    async (err, results) => {
-      if (err) {
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const user = await User.findOne({ username });
+
+        if (!user) {
+            res.status(401).json({ error: 'Invalid username or password' });
+            return;
+        }
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
+
+        if (!passwordMatch) {
+            res.status(401).json({ error: 'Invalid username or password' });
+            return;
+        }
+
+        res.status(200).json({ message: 'Login successful' });
+    } catch (error) {
+        console.error('Error during login:', error);
         res.status(500).json({ error: 'Internal server error' });
-        return;
-      }
-      if (results.length === 0) {
-        res.status(401).json({ error: 'Invalid username or password' });
-        return;
-      }
-
-      const user = results[0];
-      const passwordMatch = await bcrypt.compare(password, user.password); // Compare hashed password
-
-      if (!passwordMatch) {
-        res.status(401).json({ error: 'Invalid username or password' });
-        return;
-      }
-
-      res.status(200).json({ message: 'Login successful' });
     }
-  );
 });
 
 // Handle registration request
 app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10); // Hash password
+    const { username, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  connection.query(
-    'INSERT INTO users (username, password) VALUES (?, ?)',
-    [username, hashedPassword],
-    (err, results) => {
-      if (err) {
+    try {
+        const newUser = new User({ username, password: hashedPassword });
+        await newUser.save();
+        res.status(200).json({ message: 'Registration successful' });
+    } catch (error) {
+        console.error('Error during registration:', error);
         res.status(500).json({ error: 'Internal server error' });
-        return;
-      }
-      res.status(200).json({ message: 'Registration successful' });
     }
-  );
 });
 
-module.exports = app; // Export the app object
+// Start the server
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
