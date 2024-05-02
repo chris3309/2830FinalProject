@@ -19,21 +19,33 @@ function Login() {
         return "";
     };
 
+    const validateUsername = (username) => {
+      if (!/^[a-zA-Z0-9]+$/.test(username)) {
+        return "Username contains invalid characters.";
+    }
+    }
+
     const handleLoginSubmit = (event) => {
         event.preventDefault();
+
         // SEND TO SERVER
     };
 
     const handleRegisterSubmit = (event) => {
         event.preventDefault();
         const passwordError = validatePassword(registerPassword);
+        const usernameError = validateUsername(registerUsername);
+        if(usernameError){
+          setRegistrationError(usernameError);
+          return
+        }
         if (passwordError) {
-            setRegistrationError(passwordError);
-            return;
+          setRegistrationError(passwordError);
+          return;
         }
         if (registerPassword !== confirmPassword) {
-            setRegistrationError("Passwords do not match.");
-            return;
+          setRegistrationError("Passwords do not match.");
+          return;
         }
         setRegistrationError('');
         // SEND TO SERVER
@@ -41,6 +53,7 @@ function Login() {
 
     return (
         <div>
+            <header><h1>Scheduling System</h1></header>
             <main>
                 <section id="login">
                     <h2>LOGIN</h2>
