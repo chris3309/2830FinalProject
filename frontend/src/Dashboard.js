@@ -22,14 +22,11 @@ function Dashboard(){
 
     const handleSchedule = (e) => {
         e.preventDefault();
-        // Add the new appointment to the list
-        setAppointments([...appointments, appointmentData]);
-        // Reset the form
-        setAppointmentData({ dateTime: '', fullName: '', reason: '' });
+        setAppointments([...appointments, appointmentData]); // Add new appointments to list
+        setAppointmentData({ dateTime: '', fullName: '', reason: '' }); // Reset form
     };
 
     const handleCancel = index => {
-        // Remove the appointment from the list
         setAppointments(appointments.filter((_, i) => i !== index));
     };
 
@@ -39,9 +36,7 @@ function Dashboard(){
     }
 
     const handleLogout = () => {
-        // Simulate logout by clearing the appointments (or you could clear session/local storage)
-        setAppointments([]);
-        // Optionally redirect to login page or show login screen
+        setAppointments([]); //clear apt
         alert("You have been logged out."); // Placeholder for redirection
     };
 

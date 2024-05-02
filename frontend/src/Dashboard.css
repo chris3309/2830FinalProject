@@ -1,5 +1,4 @@
-/* General body styling */
-/* General body styling */
+
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f9;
@@ -18,7 +17,7 @@ body {
     text-align: center;
     width: 98%;
   }
-  /* Main container styling */
+
   main {
     display: flex;
     justify-content: space-between;
@@ -32,7 +31,7 @@ body {
     margin-right: 5%;
   }
   
-  /* Section styles */
+
   section {
     padding: 20px;
     width: 100%;
@@ -44,7 +43,7 @@ body {
     color: #333;
   }
   
-  /* Form styling */
+
   form {
     display: flex;
     flex-direction: column;
@@ -54,7 +53,7 @@ body {
   textarea,
   input[type="text"],
   input[type="password"]
-  { /* Added datetime-local for date inputs */
+  { 
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -85,11 +84,11 @@ body {
     background-color: #4a54e1;
   }
   
-  /* Appointments section styling */
+ 
   .appointments {
-    border: 1px solid #ccc; /* Container for appointments */
+    border: 1px solid #ccc;
     padding: 10px;
-    width: 300px; /* Fixed width for alignment */
+    width: 300px;
   }
   
   .appointment {
@@ -101,10 +100,10 @@ body {
   
   .appointment button {
     margin: 5px;
-    width: auto; /* Auto width for button */
+    width: auto; 
   }
   
-  /* Error message styling */
+  
   .error-message {
     color: #ff3860;
     text-align: center;
