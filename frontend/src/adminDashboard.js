@@ -1,8 +1,8 @@
-// User Dashboard
+// Admin Dashboard
 
 /*
 TODO:
-- Load current user's appointments from database into appointments
+- Load all appointments from database into appointments
 - Finish logout button and redirect to login page
 - Send new appointments to server to put them into database
 */
@@ -13,13 +13,13 @@ import 'react-datepicker/dist/react-datepicker.css'
 import './Dashboard.css'
 import './App.css'
 
-function Dashboard(){
+function AdminDashboard(){
     const [appointmentData, setAppointmentData] = useState({
         dateTime: new Date(),
         fullName:'',
         reason:''
     });
-    const [appointments, setAppointments] = useState([]);//Load appointments into here
+    const [appointments, setAppointments] = useState([]);//load appointments into here
 
     const handleInputChange = (e) => {
         setAppointmentData({...appointmentData, [e.target.name]:e.target.value});
@@ -52,7 +52,7 @@ function Dashboard(){
     return (
         <div>
             <header>
-                <h1>Dashboard</h1>
+                <h1>Admin Dashboard</h1>
                 <button onClick={handleLogout}>Logout</button>
             </header>
             <main>
@@ -92,7 +92,7 @@ function Dashboard(){
                 </section>
 
                 <section>
-                    <h2>My Appointments</h2>
+                    <h2>All Appointments</h2>
                     {appointments.map((app,index) => (
                         <div key={index} className="appointment">
                             <p><strong>Date:</strong> {app.dateTime.toLocaleString('en-US', { timeZonename: 'short'})}</p>
@@ -106,4 +106,4 @@ function Dashboard(){
     );
 }
 
-export default Dashboard;
+export default AdminDashboard;

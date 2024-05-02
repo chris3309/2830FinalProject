@@ -1,3 +1,12 @@
+//LOGIN PAGE
+
+/*
+TODO:
+- Finish login function and redirect to dashboard or admindashboard
+if user is admin
+- Finish register submit
+*/
+
 import React, { useState } from 'react';
 import './App.css';
 
