@@ -56,3 +56,8 @@ button{
 button:hover{
   background: #007f8b;
 }
+
+.error {
+  color: red;
+  font-weight: bold;
+}
