@@ -24,16 +24,20 @@ function Login() {
             return "Password must be between 4 and 12 characters.";
         }
         if (!/^[a-zA-Z0-9]+$/.test(password)) {
-            return "Password contains invalid characters.";
+            return "Password can contain only letters and numbers.";
         }
         return "";
     };
 
     const validateUsername = (username) => {
+      if (username.length < 1 || username.length > 15) {
+        return "Username must be between 1 and 15 characters.";
+      }
       if (!/^[a-zA-Z0-9]+$/.test(username)) {
-        return "Username contains invalid characters.";
-    }
-    }
+        return "Username can contain only letters and numbers";
+      }
+      return "";
+    } 
 
     const handleLoginSubmit = async (event) => {
         event.preventDefault();
@@ -54,6 +58,9 @@ function Login() {
 
     const handleRegisterSubmit = async (event) => {
         event.preventDefault();
+        const passwordError = validatePassword(registerPassword);
+        const usernameError = validateUsername(registerUsername);
+
         if (registerPassword !== confirmPassword) {
             setRegistrationError('Passwords do not match.');
             return;
