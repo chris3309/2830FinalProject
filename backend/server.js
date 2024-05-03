@@ -27,8 +27,9 @@ db.once('open', () => {
 
 // Define MongoDB Schema and Model
 const userSchema = new mongoose.Schema({
-    username: { type: String, required: true },
+    username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    role: { type: String, default: 'user'}
 });
 
 const User = mongoose.model('User', userSchema);

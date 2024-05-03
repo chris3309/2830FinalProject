@@ -10,7 +10,7 @@ if user is admin
 import React, { useState } from 'react';
 import axios from 'axios';
 import './App.css';
-import { useResolvedPath } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
     const [loginUsername, setLoginUsername] = useState('');
@@ -20,6 +20,8 @@ function Login() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [registrationError, setRegistrationError] = useState('');
     const [registrationSuccess, setRegistrationSuccess] = useState('');
+    const [loginFailure, setLoginFailure] = useState('');
+    const navigate = useNavigate();
 
     const validatePassword = (password) => {
         if (password.length < 4 || password.length > 12) {
@@ -43,7 +45,6 @@ function Login() {
 
     const handleLoginSubmit = async (event) => {
         event.preventDefault();
-
         // SEND TO SERVER
         try {
             const response = await axios.post('http://localhost:3001/login', {
@@ -52,8 +53,18 @@ function Login() {
             });
 
             console.log(response.data); // Handle login success
+
+            //Navigate to correct dashboard
+            if(response.data.role==='admin'){
+              navigate('/adminDashboard');
+            }
+            else {
+              navigate('/Dashboard');
+            }
+
         } catch (error) {
             console.error('Login failed:', error);
+            setLoginFailure('Login failed. Username or Password is incorrect.');
         }
     };
    
@@ -105,6 +116,7 @@ function Login() {
                         <input type='text' id='username' name='username' value={loginUsername} onChange={e => setLoginUsername(e.target.value)} />
                         <label htmlFor="password">Password:</label>
                         <input type='password' id='password' name='password' value={loginPassword} onChange={e => setLoginPassword(e.target.value)} />
+                        {loginFailure && <div className='error-message'>{loginFailure}</div>}
                         <button type='submit'>Login</button>
                     </form>
                 </section>
