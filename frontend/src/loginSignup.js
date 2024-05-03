@@ -10,6 +10,7 @@ if user is admin
 import React, { useState } from 'react';
 import axios from 'axios';
 import './App.css';
+import { useResolvedPath } from 'react-router-dom';
 
 function Login() {
     const [loginUsername, setLoginUsername] = useState('');
@@ -18,6 +19,7 @@ function Login() {
     const [registerPassword, setRegisterPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [registrationError, setRegistrationError] = useState('');
+    const [registrationSuccess, setRegistrationSuccess] = useState('');
 
     const validatePassword = (password) => {
         if (password.length < 4 || password.length > 12) {
@@ -61,11 +63,23 @@ function Login() {
         const passwordError = validatePassword(registerPassword);
         const usernameError = validateUsername(registerUsername);
 
+        //Check to see if username and password are valid
         if (registerPassword !== confirmPassword) {
             setRegistrationError('Passwords do not match.');
             return;
         }
+        
+        if (passwordError !== '') {
+          setRegistrationError(passwordError);
+          return;
+        }
+      
+        if (usernameError !== '') {
+          setRegistrationError(usernameError);
+          return;
+        }
 
+        //Send to server if valid
         try {
             const response = await axios.post('http://localhost:3001/register', {
                 username: registerUsername,
@@ -73,8 +87,10 @@ function Login() {
             });
 
             console.log(response.data); // Handle registration success
+            setRegistrationSuccess('Registration success. Please log in.')
         } catch (error) {
             console.error('Registration failed:', error);
+            setRegistrationError("Registration failed.");
         }
     };
 
@@ -103,6 +119,7 @@ function Login() {
                         <label htmlFor="confirm-password">Confirm Password:</label>
                         <input type='password' id='confirm-password' name='confirm-password' value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
                         {registrationError && <div className="error-message">{registrationError}</div>}
+                        {registrationSuccess && <div className="success">{registrationSuccess}</div>}
                         <button type='submit'>Register</button>
                     </form>
                 </section>

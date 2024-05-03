@@ -62,3 +62,9 @@ button:hover{
   color: red;
   padding-bottom: 10px;
 }
+
+.success {
+  font-size: small;
+  color: green;
+  padding-bottom: 10px;
+}
