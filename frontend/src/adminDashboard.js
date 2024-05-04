@@ -1,11 +1,6 @@
 // Admin Dashboard
 
-/*
-TODO:
-- Load all appointments from database into appointments (Half works, bad values)
-- Finish logout button and redirect to login page (Seems to work fine)
-- Finish cancel button
-*/
+
 
 import React, { useState, useEffect } from "react";
 import DatePicker from 'react-datepicker'
@@ -36,6 +31,7 @@ function AdminDashboard() {
                 });
                 if (response.ok) {
                     const data = await response.json();
+                    console.log(data)
                     setAppointments(data);
                 } else {
                     throw new Error('Failed to fetch appointments');
@@ -55,14 +51,54 @@ function AdminDashboard() {
         setAppointmentData({ ...appointmentData, dateTime: date });
     };
 
-    const handleSchedule = (e) => {
+    const handleSchedule = async (e) => {
         e.preventDefault();
+        const dateTimeString = new Date(appointmentData.dateTime).toLocaleString('en-US', { timeZoneName: 'short'});
         setAppointments([...appointments, appointmentData]); // Add new appointments to list
-        setAppointmentData({ dateTime: new Date(), fullName: '', reason: '' }); // Reset form
+        setAppointmentData({ dateTime: '', fullName: '', reason: '' }); // Reset form
+        const formatedDate = {...appointmentData, dateTime: dateTimeString};
+        try {
+            const token = localStorage.getItem('userToken');
+            const response = await fetch('http://localhost:3001/scheduleAppointment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(formatedDate)
+            });
+            if (!response.ok) {
+                throw new Error('Failed to schedule appointment.');
+            }
+            const data = await response.json();
+            console.log(data.message);
+        } catch (error) {
+            console.error('Error submitting appointment:', error);
+        }
     };
 
-    const handleCancel = index => {
-        setAppointments(appointments.filter((_, i) => i !== index));
+    const handleCancel = async (id) => {
+        console.log('Attempting to cancel appt with id:', id);
+        try{
+            const token = localStorage.getItem('userToken');
+            const response = await fetch('http://localhost:3001/delete/'+id, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer '+token
+                }
+            });
+            if(!response.ok){
+                throw new Error('Failure to cancel appointment.');
+            }
+            const data = await response.json();
+            console.log(data.message);
+            setAppointments(currentAppointments => currentAppointments.filter(app => app._id !== id));
+        }
+        catch(error){
+            console.error('Error cancelling appointment:', error);
+        }
+        
+        //setAppointments(appointments.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (event) => {
@@ -120,11 +156,11 @@ function AdminDashboard() {
                 <section>
                     <h2>All Appointments</h2>
                     {appointments.map((app, index) => (
-                        <div key={index} className="appointment">
+                        <div key={app._id} className="appointment">
                             <p><strong>Date:</strong> {new Date(app.dateTime).toLocaleString('en-US', { timeZonename: 'short' })}</p>
                             <p><strong>Name:</strong> {app.fullName}</p>
                             <p><strong>Notes:</strong> {app.reason}</p>
-                            <button style={{ backgroundColor: 'red' }} onClick={() => handleCancel(index)}>Cancel</button>
+                            <button style={{ backgroundColor: 'red' }} onClick={() => handleCancel(app._id)}>Cancel</button>
                         </div>
                     ))}
                 </section>

@@ -36,13 +36,14 @@ const userSchema = new mongoose.Schema({
 
 const appointmentSchema = new mongoose.Schema({
     dateTime: String,
-    name: String,
-    notes: String,
+    fullName: String,
+    reason: String,
     user: String,
 })
 
 const User = mongoose.model('User', userSchema);
 const Appointment = mongoose.model('Appointments', appointmentSchema);
+
 
 const authToken = (req,res,next)=>{
     const authHeader = req.headers['authorization'];
@@ -97,7 +98,7 @@ app.post('/scheduleAppointment', authToken, async (req,res)=>{
         });
         await newappointment.save();
         res.status(201).json({
-            message: req.user.userId+': Appoinment created successfully.'
+            message: req.user.userId+': Appoinment created successfully.',
         });
     }
     catch(error){
@@ -119,7 +120,7 @@ app.get('/userAppointments', authToken, async (req, res) => {
 });
 
 //Retrieve all appointments for admin
-app.get('/allAppointments', async (req, res) => {
+app.get('/allAppointments', authToken, async (req, res) => {
     try {
         // Fetch all appointments from the database
         const appointments = await Appointment.find();
@@ -178,6 +179,26 @@ app.post('/register', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+
+//Cancel appointment
+app.delete('/delete/:id', authToken, async (req,res)=> {
+    try{
+        const {id} = req.params;
+        const result = await Appointment.findByIdAndDelete(id);
+        if(result){
+            res.status(200).json({message:'Appointment deleted successfully.'});
+        }
+        else{
+            res.status(404).json({message:'Appointment not found'});
+        }
+    }
+    catch(error){
+        console.error('Error deleting appointment:', error);
+        res.status(500).json({error:'Internal server error.'});
+    }
+});
+
 
 // Start the server
 app.listen(port, () => {

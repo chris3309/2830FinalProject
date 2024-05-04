@@ -1,10 +1,6 @@
 // User Dashboard
 
-/*
-TODO:
-- Load current user's appointments from database into appointments (Half works, bad values)
-- Finish logout button and redirect to login page (Seems to work fine)
-*/
+
 
 import React, { useState, useEffect } from "react";
 import DatePicker from 'react-datepicker'
@@ -82,8 +78,28 @@ function Dashboard(){
         }
     };
 
-    const handleCancel = index => {
-        setAppointments(appointments.filter((_, i) => i !== index));
+    const handleCancel = async (id) => {
+        console.log('Attempting to cancel appt with id:', id);
+        try{
+            const token = localStorage.getItem('userToken');
+            const response = await fetch('http://localhost:3001/delete/'+id, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer '+token
+                }
+            });
+            if(!response.ok){
+                throw new Error('Failure to cancel appointment.');
+            }
+            const data = await response.json();
+            console.log(data.message);
+            setAppointments(currentAppointments => currentAppointments.filter(app => app._id !== id));
+        }
+        catch(error){
+            console.error('Error cancelling appointment:', error);
+        }
+        
+        //setAppointments(appointments.filter((_, i) => i !== index));
     };
 
     const handleLogout = () => {
@@ -137,10 +153,10 @@ function Dashboard(){
                 <section>
                     <h2>My Appointments</h2>
                     {appointments.map((app,index) => (
-                        <div key={index} className="appointment">
+                        <div key={app._id} className="appointment">
                             <p><strong>Date:</strong> {new Date(app.dateTime).toLocaleString('en-US', { timeZoneName: 'short'})}</p>
                             <p><strong>Notes:</strong> {app.reason}</p>
-                            <button style={{backgroundColor: 'red'}} onClick={()=>handleCancel(index)}>Cancel</button>
+                            <button style={{backgroundColor: 'red'}} onClick={()=>handleCancel(app._id)}>Cancel</button>
                         </div>
                     ))}
                 </section>
