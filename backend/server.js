@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
 });
 
 const appointmentSchema = new mongoose.Schema({
-    date: String,
+    dateTime: String,
     name: String,
     notes: String,
     user: String,
@@ -60,8 +60,6 @@ const authToken = (req,res,next)=>{
         return res.sendStatus(401);
     }
 }
-
-
 
 async function createAdmin(){
     try{
@@ -104,6 +102,33 @@ app.post('/scheduleAppointment', authToken, async (req,res)=>{
     }
     catch(error){
         res.status(500).json({message:'Failed to create appoinment:', error: error.message});
+    }
+});
+
+//Load appointments back into dashboard upon log in
+app.get('/userAppointments', authToken, async (req, res) => {
+    try {
+        // Find user's appointments in database
+        const appointments = await Appointment.find({ user: req.user.userId });
+
+        res.status(200).json(appointments);
+    } catch (error) {
+        console.error('Error loading appointments:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//Retrieve all appointments for admin
+app.get('/allAppointments', async (req, res) => {
+    try {
+        // Fetch all appointments from the database
+        const appointments = await Appointment.find();
+
+        // Return the appointments as JSON response
+        res.status(200).json(appointments);
+    } catch (error) {
+        console.error('Error fetching appointments:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
