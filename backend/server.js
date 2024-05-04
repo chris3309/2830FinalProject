@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+require('dotenv').config()
 
 const app = express();
 const port = 3001;
@@ -34,6 +36,7 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+
 // Handle login request
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
@@ -52,8 +55,14 @@ app.post('/login', async (req, res) => {
             res.status(401).json({ error: 'Invalid username or password' });
             return;
         }
-
-        res.status(200).json({ message: 'Login successful' });
+        
+        const token = jwt.sign(
+            { userId: user.username, role:user.role },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '1h' }
+        );
+        
+        res.status(200).json({ message: 'Login successful', token });
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ error: 'Internal server error' });

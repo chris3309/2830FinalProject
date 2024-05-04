@@ -12,8 +12,10 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import './Dashboard.css'
 import './App.css'
+import { useNavigate } from "react-router-dom";
 
 function Dashboard(){
+    const navigate = useNavigate();
     const [appointmentData, setAppointmentData] = useState({
         dateTime: new Date(),
         fullName:'',
@@ -46,7 +48,8 @@ function Dashboard(){
 
     const handleLogout = () => {
         setAppointments([]); //clear apt
-        alert("You have been logged out."); // Placeholder for redirection
+        localStorage.removeItem('userToken');
+        navigate('/');
     };
 
     return (

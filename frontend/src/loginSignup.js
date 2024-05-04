@@ -1,12 +1,5 @@
 //LOGIN PAGE
 
-/*
-TODO:
-- Finish login function and redirect to dashboard or admindashboard
-if user is admin
-- Finish register submit
-*/
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import './App.css';
@@ -53,13 +46,20 @@ function Login() {
             });
 
             console.log(response.data); // Handle login success
-
+            const { token } = response.data;
             //Navigate to correct dashboard
             if(response.data.role==='admin'){
-              navigate('/adminDashboard');
+              if(response.data.token){
+                localStorage.setItem('userToken', response.data.token);
+                navigate('/adminDashboard');
+              }
             }
             else {
-              navigate('/Dashboard');
+              if(response.data.token){
+                localStorage.setItem('userToken', response.data.token);
+                navigate('/Dashboard');
+              }
+              
             }
 
         } catch (error) {

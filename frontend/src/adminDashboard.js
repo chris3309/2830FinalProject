@@ -5,6 +5,7 @@ TODO:
 - Load all appointments from database into appointments
 - Finish logout button and redirect to login page
 - Send new appointments to server to put them into database
+- Finish cancel button
 */
 
 import React, { useState } from "react";
@@ -46,7 +47,8 @@ function AdminDashboard(){
 
     const handleLogout = () => {
         setAppointments([]); //clear apt
-        alert("You have been logged out."); // Placeholder for redirection
+        localStorage.removeItem('userToken');
+        navigate('/');
     };
 
     return (
@@ -96,6 +98,7 @@ function AdminDashboard(){
                     {appointments.map((app,index) => (
                         <div key={index} className="appointment">
                             <p><strong>Date:</strong> {app.dateTime.toLocaleString('en-US', { timeZonename: 'short'})}</p>
+                            <p><strong>Name:</strong> {app.fullName}</p>
                             <p><strong>Notes:</strong> {app.reason}</p>
                             <button style={{backgroundColor: 'red'}} onClick={()=>handleCancel(index)}>Cancel</button>
                         </div>
