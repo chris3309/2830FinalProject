@@ -15,6 +15,7 @@ import './App.css'
 import { useNavigate } from "react-router-dom";
 
 function Dashboard(){
+    const token = localStorage.getItem('userToken');
     const navigate = useNavigate();
     const [appointmentData, setAppointmentData] = useState({
         dateTime: new Date(),
@@ -22,7 +23,11 @@ function Dashboard(){
         reason:''
     });
     const [appointments, setAppointments] = useState([]);//Load appointments into here
-
+    const [convertData, setConvertData] = useState({
+        dateTime: '',
+        fullName:'',
+        reason:''
+    });
     const handleInputChange = (e) => {
         setAppointmentData({...appointmentData, [e.target.name]:e.target.value});
     }
@@ -33,8 +38,27 @@ function Dashboard(){
 
     const handleSchedule = (e) => {
         e.preventDefault();
+        const dateTimeString = new Date(appointmentData.dateTime).toLocaleString('en-US', { timeZonename: 'short'});
         setAppointments([...appointments, appointmentData]); // Add new appointments to list
         setAppointmentData({ dateTime: '', fullName: '', reason: '' }); // Reset form
+
+        const formatedDate = {...appointmentData, dateTime: dateTimeString};
+        fetch('http://localhost:3001/scheduleAppointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+ token
+            },
+            body: JSON.stringify(formatedDate)
+        }).then(response => {
+            if(response.ok){
+                return response.json();
+            }
+            else{
+                throw new Error('Failed to schedule appointment.');
+            }
+        }).then(data => console.log(data.message))
+        .catch(error => console.error('Error submitting appointment:',error));
     };
 
     const handleCancel = index => {

@@ -34,7 +34,34 @@ const userSchema = new mongoose.Schema({
     role: { type: String, default: 'user'}
 });
 
+const appointmentSchema = new mongoose.Schema({
+    date: String,
+    name: String,
+    notes: String,
+    user: String,
+})
+
 const User = mongoose.model('User', userSchema);
+const Appointment = mongoose.model('Appointments', appointmentSchema);
+
+const authToken = (req,res,next)=>{
+    const authHeader = req.headers['authorization'];
+    const token = authHeader&&authHeader.split(' ')[1];
+    if(token){
+        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user)=>{
+            if(err){
+                return res.sendStatus(403);
+            }
+            req.user = user;
+            next();
+        })
+    }
+    else{
+        return res.sendStatus(401);
+    }
+}
+
+
 
 async function createAdmin(){
     try{
@@ -59,6 +86,26 @@ async function createAdmin(){
 }
 
 createAdmin();
+
+app.post('/scheduleAppointment', authToken, async (req,res)=>{
+    
+    try{
+        const {dateTime, fullName, reason} = req.body;
+        const newappointment = new Appointment({
+            dateTime,
+            fullName,
+            reason,
+            user: req.user.userId
+        });
+        await newappointment.save();
+        res.status(201).json({
+            message: req.user.userId+': Appoinment created successfully.'
+        });
+    }
+    catch(error){
+        res.status(500).json({message:'Failed to create appoinment:', error: error.message});
+    }
+});
 
 // Handle login request
 app.post('/login', async (req, res) => {
