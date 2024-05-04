@@ -13,8 +13,10 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import './Dashboard.css'
 import './App.css'
+import { useNavigate } from "react-router-dom";
 
 function AdminDashboard(){
+    const navigate = useNavigate();
     const [appointmentData, setAppointmentData] = useState({
         dateTime: new Date(),
         fullName:'',

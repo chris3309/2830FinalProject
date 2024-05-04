@@ -36,6 +36,29 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+async function createAdmin(){
+    try{
+        const ifAdmin = await User.findOne({username: 'admin'});
+        if(ifAdmin){
+            console.log('Admin account already exists.');
+        }
+        else{
+            const adminPassword = bcrypt.hashSync('adminPassword', 10);
+            const admin = new User({
+                username: 'admin',
+                password: adminPassword,
+                role: 'admin'
+            });
+            await admin.save();
+            console.log('Created admin account');
+        }
+    }
+    catch(error){
+        console.error('Error creating admin account:', error);
+    }
+}
+
+createAdmin();
 
 // Handle login request
 app.post('/login', async (req, res) => {
@@ -62,7 +85,7 @@ app.post('/login', async (req, res) => {
             { expiresIn: '1h' }
         );
         
-        res.status(200).json({ message: 'Login successful', token });
+        res.status(200).json({ message: 'Login successful', token, role: user.role });
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ error: 'Internal server error' });
